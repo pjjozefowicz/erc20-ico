@@ -10,13 +10,13 @@ contract Token is IERC20 {
     uint public decimals = 18;
     uint public override totalSupply;
 
-    address public founder;
+    address public owner;
     mapping(address => uint) public balances;
 
     constructor(uint _totalSupply) {
         totalSupply = _totalSupply;
-        founder = msg.sender;
-        balances[founder] = totalSupply;
+        owner = msg.sender;
+        balances[owner] = totalSupply;
     }
 
     function balanceOf(address _who) public override view returns (uint256) {
