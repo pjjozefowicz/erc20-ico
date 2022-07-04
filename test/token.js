@@ -58,5 +58,27 @@ describe("Token", function () {
       expect(await token.balanceOf(addr1.address)).to.equal(100);
       expect(await token.balanceOf(addr2.address)).to.equal(50);
     });
+    it("Should set proper allowance after address approval", async function () {
+      await token.approve(addr1.address, 100);
+      expect(await token.allowance(owner.address, addr1.address)).to.equal(100);
+    });
+    it("Should revert when address tries to approve more tokens than it has", async function () {
+      await expect(token.connect(addr1).approve(addr2.address, 100)).to.be.reverted;
+    });
+    it("Should revert when address tries to approve negative amount of tokens", async function () {
+      await expect(token.approve(addr2.address, -100)).to.be.reverted;
+    });
+    it("Should correctly transfer tokens after approval", async function () {
+      const initialOwnerBalance = await token.balanceOf(owner.address);
+      await token.approve(addr1.address, 100);
+      await token.connect(addr1).transferFrom(owner.address, addr2.address, 50);
+      expect(await token.balanceOf(addr2.address)).to.equal(50);
+      expect(await token.allowance(owner.address, addr1.address)).to.equal(50);
+      expect(await token.balanceOf(owner.address)).to.equal(initialOwnerBalance - 50);
+    });
+    it("Should revert when address tries to transfer more tokens than were approved", async function () {
+      await token.approve(addr1.address, 100);
+      await expect(token.connect(addr1).transferFrom(owner.address, addr2.address, 105)).to.be.reverted;
+    });
   })
 });
