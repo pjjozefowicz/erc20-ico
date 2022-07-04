@@ -7,7 +7,7 @@ import "./IERC20.sol";
 contract Token is IERC20 {
     string public name = "Piotr Jozefowicz Token";
     string public symbol = "PJZV";
-    uint public decimals = 18;
+    uint public decimals = 0;
     uint public override totalSupply;
 
     address public owner;
