@@ -1,5 +1,5 @@
 # erc20-ico
-Implementation of [ERC20]("https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md") token together with initial coin offering functionality written in hardhat environment.
+Implementation of [ERC20](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md) token together with initial coin offering functionality written in hardhat environment.
 
 - ICO is a Smart Contract that accepts ETH in exchange for PJZV token
 - The PJZV token is a fully compliant ERC20 token and will be generated at the ICO time
