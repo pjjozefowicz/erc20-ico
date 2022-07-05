@@ -26,7 +26,7 @@ contract Token is IERC20 {
     }
 
     function transfer(address _to, uint256 _value) public virtual override returns (bool) {
-        require(balances[msg.sender] >= _value);
+        require(balances[msg.sender] >= _value, "You don't have enough tokens");
         
         balances[_to] += _value;
         balances[msg.sender] -= _value;
@@ -40,8 +40,8 @@ contract Token is IERC20 {
     }
 
     function approve(address _spender, uint256 _value) public override returns (bool) {
-        require(balances[msg.sender] >= _value);
-        require(_value > 0);
+        require(balances[msg.sender] >= _value, "You don't have enough tokens");
+        require(_value > 0, "Value needs to be greater than 0");
 
         allowed[msg.sender][_spender] = _value;
 
@@ -50,8 +50,8 @@ contract Token is IERC20 {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public virtual override returns (bool) {
-        require(allowed[_from][msg.sender] >= _value);
-        require(balances[_from] >= _value);
+        require(allowed[_from][msg.sender] >= _value, "Not enough tokens allowed");
+        require(balances[_from] >= _value, "Owner of tokens does not have enough of them");
         balances[_from] -= _value;
         allowed[_from][msg.sender] -= _value;
         balances[_to] += _value;
