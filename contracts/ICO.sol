@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "hardhat/console.sol";
 import "./Token.sol";
 
-contract TokenICO is Token (1000000) {
+contract TokenICO is Token {
     address public admin;
     address payable public deposit;
     uint tokenPrice = 0.001 ether; // 1ETH = 1000 PJZV, 1 PJZV = 0.001 ETH
@@ -24,19 +24,19 @@ contract TokenICO is Token (1000000) {
     }
     State public icoState;
 
-    constructor(address payable _deposit) {
+    constructor(uint _totalSupply, address payable _deposit) Token(_totalSupply) {
         deposit = _deposit;
         admin = msg.sender;
         icoState = State.beforeStart;
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin);
+        require(msg.sender == admin, "Only admin can do this");
         _;
     }
 
     modifier lockUpEnded() {
-        require(block.timestamp > tokenTradeStart);
+        require(block.timestamp > tokenTradeStart, "Can't do this before lock up period ends");
         _;
     }
 
@@ -68,13 +68,15 @@ contract TokenICO is Token (1000000) {
 
     function invest() payable public returns(bool) {
         icoState = getCurrentState();
-        require(icoState == State.running);
+        require(icoState == State.running, "Initial coin offering is not running");
 
-        require(msg.value >= minInvestment && msg.value <= maxInvestement);
-        raisedAmount += msg.value;
-        require(raisedAmount <= hardcap);
+        require(msg.value >= minInvestment && msg.value <= maxInvestement, "You can't send less than 0.1 ETH and more than 5 ETH");
 
         uint tokens = msg.value / tokenPrice;
+        require(balances[msg.sender] + tokens <= 5000, "Single address can't have more than 5000 PJZV");
+
+        raisedAmount += msg.value;
+        require(raisedAmount <= hardcap, "Value would exceed hardcap");
 
         balances[msg.sender] += tokens;
         balances[owner] -= tokens;
@@ -100,8 +102,9 @@ contract TokenICO is Token (1000000) {
     }
 
     function burn() public returns(bool) {
+        // anyone can burn tokens after sale to prevent admin keeping them to himself
         icoState = getCurrentState();
-        require(icoState == State.afterEnd);
+        require(icoState == State.afterEnd, "You can't burn tokens before sale ends");
         balances[owner] = 0;
         return true;
     }
